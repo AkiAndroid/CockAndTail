@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import com.example.cockandtail.Database.DBRepository
+import com.example.cockandtail.Database.cocktailsDb
 import com.example.cockandtail.Repository.MainRepository
 import com.example.cockandtail.UIdata.Model.JsonResponse
 import com.example.cockandtail.UIdata.Model.cocktail
@@ -24,6 +25,18 @@ class MainViewModel (private val mainRepository: MainRepository, private val dbR
 
     private var mutableDrinksList : MutableLiveData<Resource<JsonResponse>> = MutableLiveData()
     val drinksList: LiveData<Resource<JsonResponse>> get() = mutableDrinksList
+
+    var favouriteView:MutableLiveData<Boolean> = MutableLiveData(false)
+
+    fun DbOpsofAddfavts(cocktail: cocktail){
+
+        coroutineScope.launch {
+            dbRepository.insert(cocktailsDb(cocktail.id,cocktail.imageurl,cocktail.name,cocktail.instruction))
+        }
+    }
+
+    val getAllFavourites get() = dbRepository.getAllFavourites()
+
 
     fun getDrinksByName(cocktailName:String) {
         coroutineScope.launch {

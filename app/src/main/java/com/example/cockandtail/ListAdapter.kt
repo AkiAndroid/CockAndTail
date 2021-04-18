@@ -21,12 +21,22 @@ class ListAdapter(): RecyclerView.Adapter<ListAdapter.Viewholder>() {
     private var mutableItemClickListener:MutableLiveData<Int> = MutableLiveData(-1)
     val itemClickListener:LiveData<Int> get() = mutableItemClickListener
 
-     inner class Viewholder(view: View):RecyclerView.ViewHolder(view) {
+    private var FavtmutableItemClickListener:MutableLiveData<Int> = MutableLiveData(-1)
+    val FavtitemClickListener:LiveData<Int> get() = FavtmutableItemClickListener
+
+
+
+    inner class Viewholder(view: View):RecyclerView.ViewHolder(view) {
        var name_text=view.findViewById<TextView>(R.id.name_cocktail)
         var thumbnail=view.findViewById<ImageView>(R.id.thuumbnail)
         init {
             view.setOnClickListener {
                 mutableItemClickListener.value=adapterPosition
+            }
+
+            view.setOnLongClickListener {
+                FavtmutableItemClickListener.value =adapterPosition
+                return@setOnLongClickListener true
             }
         }
     }

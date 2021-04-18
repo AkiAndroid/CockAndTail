@@ -21,6 +21,7 @@ import com.example.cockandtail.UIdata.Model.cocktail
 import com.example.cockandtail.ViewModels.MainViewModel
 import com.example.cockandtail.ViewModels.ViewModelFactory
 import com.example.cockandtail.utils.UIstatus
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(){
@@ -65,7 +66,7 @@ class MainActivity : AppCompatActivity(){
 
         viewModel.drinksList.removeObservers(this)
         viewModel.drinksList.observe(this, {
-            if (it != null) {
+            if (it != null && viewModel.favouriteView.value == false) {
                 when (it.status) {
                     UIstatus.Loading -> {
 
@@ -88,6 +89,57 @@ class MainActivity : AppCompatActivity(){
             viewModel.listPopupPosition = it
             if (it != null && it >= 0){
                 onItemClick(it)
+            }
+        })
+
+        listAdapter.FavtitemClickListener.observe(this,{
+            if (it!= null && it >=0){
+                viewModel.DbOpsofAddfavts(list[it])
+            }
+        })
+
+        var favtButton=findViewById<FloatingActionButton>(R.id.favtButton)
+
+        favtButton.setOnClickListener{
+            viewModel.favouriteView.value = viewModel.favouriteView.value != true
+        }
+
+        viewModel.favouriteView.removeObservers(this)
+        viewModel.favouriteView.observe(this,{
+            if (it == false){
+                if (viewModel.drinksList.value?.data != null){
+                    list = viewModel.drinksList.value?.data?.drinks?.let { it1 -> it1 }?: ArrayList()
+                    listAdapter.cocktail = list
+                    listAdapter.notifyDataSetChanged()
+                    if (viewModel.listPopupPosition >= 0)
+                        onItemClick(viewModel.listPopupPosition)
+                }
+
+            }else{
+                if (viewModel.getAllFavourites.value != null) {
+                    val cocktailList: ArrayList<cocktail> = ArrayList()
+                    for( cocktaildb in viewModel.getAllFavourites.value!!){
+                        cocktailList.add(cocktail(cocktaildb.id, cocktaildb.instruction, cocktaildb.name, cocktaildb.imageurl))
+                    }
+                    list=cocktailList
+
+                    listAdapter.cocktail=cocktailList
+                    listAdapter.notifyDataSetChanged()
+                }
+            }
+        })
+
+        viewModel.getAllFavourites.removeObservers(this)
+        viewModel.getAllFavourites.observe(this, {
+            if (viewModel.favouriteView.value == true &&it != null){
+                val cocktailList: ArrayList<cocktail> = ArrayList()
+                for( cocktaildb in viewModel.getAllFavourites.value!!){
+                    cocktailList.add(cocktail(cocktaildb.id, cocktaildb.instruction, cocktaildb.name, cocktaildb.imageurl))
+                }
+                list=cocktailList
+
+                listAdapter.cocktail=cocktailList
+                listAdapter.notifyDataSetChanged()
             }
         })
 

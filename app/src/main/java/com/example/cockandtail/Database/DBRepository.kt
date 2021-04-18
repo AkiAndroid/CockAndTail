@@ -21,7 +21,11 @@ class DBRepository @Inject constructor(application: MyApplication) {
     }
 
     suspend fun insert(cocktailsDb: cocktailsDb) {
-        cocktailDao.insert(cocktailsDb)
+        try {
+            cocktailDao.insert(cocktailsDb)
+        }catch(e:Exception) {
+
+        }
     }
 
     suspend fun deleteAllNotes() {
